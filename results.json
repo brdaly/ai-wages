@@ -1,0 +1,46 @@
+{
+  "n_occupations": 454,
+  "pearson_wage_exposure": 0.197,
+  "spearman_wage_exposure": 0.333,
+  "augmentation_share": 0.574,
+  "automation_share": 0.426,
+  "by_wage_quintile": [
+    {
+      "wage_q": "Q1 (lowest pay)",
+      "n": 91,
+      "median_wage": 27730.0,
+      "mean_AI_exposure": 0.0372,
+      "mean_predicted_automatability": 0.7174
+    },
+    {
+      "wage_q": "Q2",
+      "n": 91,
+      "median_wage": 38750.0,
+      "mean_AI_exposure": 0.0562,
+      "mean_predicted_automatability": 0.7119
+    },
+    {
+      "wage_q": "Q3",
+      "n": 90,
+      "median_wage": 49500.0,
+      "mean_AI_exposure": 0.0657,
+      "mean_predicted_automatability": 0.4585
+    },
+    {
+      "wage_q": "Q4",
+      "n": 91,
+      "median_wage": 63340.0,
+      "mean_AI_exposure": 0.0975,
+      "mean_predicted_automatability": 0.3478
+    },
+    {
+      "wage_q": "Q5 (highest pay)",
+      "n": 91,
+      "median_wage": 92250.0,
+      "mean_AI_exposure": 0.1019,
+      "mean_predicted_automatability": 0.1444
+    }
+  ],
+  "peak_decile_exposure": 0.11977391304347826,
+  "peak_decile_index": 9
+}
