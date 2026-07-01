@@ -101,8 +101,7 @@ top = df.sort_values("observed_exposure", ascending=False).head(12)
 # ----------------------------------------------------------------------
 # 5. Augmentation vs automation (collaboration mix), AEI 2025-02-10
 # ----------------------------------------------------------------------
-collab = {"directive": 22.56, "feedback loop": 12.04, "learning": 18.92,
-          "task iteration": 25.48, "validation": 2.31, "none": 2.90}
+collab = pd.read_csv(f"{DATA}/automation_vs_augmentation.csv").set_index("interaction_type")["pct"]
 automation = collab["directive"] + collab["feedback loop"]
 augmentation = collab["learning"] + collab["task iteration"] + collab["validation"]
 classified = automation + augmentation
