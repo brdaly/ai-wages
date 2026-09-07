@@ -1,0 +1,22 @@
+cff-version: 1.2.0
+message: "If you use this analysis or its figures, please cite it as below."
+title: "Where AI Is Actually Used Across the Wage Distribution"
+authors:
+  - family-names: Daly
+    given-names: Brendan
+type: software
+date-released: 2026-07-01
+version: "1.0"
+license: MIT
+repository-code: "https://github.com/brdaly/ai-wages"
+abstract: >-
+  A short, reproducible empirical note joining the Anthropic Economic Index
+  (observed AI use by occupation) to BLS occupational wages, and contrasting it
+  with a legacy predicted-automatability index. Observed AI exposure rises with
+  wages; predicted automatability falls with wages.
+keywords:
+  - artificial intelligence
+  - labor economics
+  - wages
+  - AI adoption
+  - Anthropic Economic Index

@@ -1,0 +1,30 @@
+version: 2
+
+updates:
+  - package-ecosystem: pip
+    directory: /
+    schedule:
+      interval: monthly
+      timezone: America/Detroit
+    open-pull-requests-limit: 3
+    groups:
+      python-dependencies:
+        patterns:
+          - "*"
+        update-types:
+          - minor
+          - patch
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly
+      timezone: America/Detroit
+    open-pull-requests-limit: 3
+    groups:
+      routine-action-updates:
+        patterns:
+          - "*"
+        update-types:
+          - minor
+          - patch
