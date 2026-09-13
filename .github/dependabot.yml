@@ -14,6 +14,23 @@ updates:
         update-types:
           - minor
           - patch
+    ignore:
+      # This repository is a frozen empirical artifact: the committed
+      # results.json and figures must keep reproducing from the committed
+      # data. The entries in requirements.txt are floors, not pins, so
+      # raising a floor never unlocks a newer library for readers who can
+      # already install it - it only drops readers on older Python.
+      #
+      # Concretely, Dependabot PR #5 proposed numpy >=2.5.3, which requires
+      # Python 3.12 or newer and failed CI on Python 3.11 at the install
+      # step. Major floor bumps are reviewed by hand instead, alongside a
+      # deliberate decision about the supported Python range.
+      #
+      # Security updates are unaffected: Dependabot security advisories
+      # ignore these rules.
+      - dependency-name: "*"
+        update-types:
+          - version-update:semver-major
 
   - package-ecosystem: github-actions
     directory: /
