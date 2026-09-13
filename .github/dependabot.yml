@@ -7,6 +7,23 @@ updates:
       interval: monthly
       timezone: America/Detroit
     open-pull-requests-limit: 3
+
+    # This repository is a frozen empirical artifact: the committed
+    # results.json and figures must keep reproducing from the committed
+    # data. The entries in requirements.txt are open-ended floors, not
+    # pins, so a reader on a newer Python already resolves newer
+    # libraries. Raising a floor unlocks nothing and only drops readers
+    # on older interpreters.
+    #
+    # The default pip strategy is "increase", which rewrites a
+    # requirement to the newest release whether or not the existing
+    # constraint blocks it. That is what produced PRs #7, #8 and #9
+    # roughly a minute after the major-only ignore merged in PR #6.
+    # "increase-if-necessary" rewrites only when the current constraint
+    # genuinely excludes the new version, which for open floors means
+    # never.
+    versioning-strategy: increase-if-necessary
+
     groups:
       python-dependencies:
         patterns:
@@ -14,17 +31,12 @@ updates:
         update-types:
           - minor
           - patch
+
     ignore:
-      # This repository is a frozen empirical artifact: the committed
-      # results.json and figures must keep reproducing from the committed
-      # data. The entries in requirements.txt are floors, not pins, so
-      # raising a floor never unlocks a newer library for readers who can
-      # already install it - it only drops readers on older Python.
-      #
-      # Concretely, Dependabot PR #5 proposed numpy >=2.5.3, which requires
-      # Python 3.12 or newer and failed CI on Python 3.11 at the install
-      # step. Major floor bumps are reviewed by hand instead, alongside a
-      # deliberate decision about the supported Python range.
+      # Second gate. If a floor ever does need to rise past a major
+      # boundary, that belongs with a deliberate decision about the
+      # supported Python range - numpy >=2.5.3 requires Python 3.12 or
+      # newer and failed CI on 3.11 at the install step (PR #5).
       #
       # Security updates are unaffected: Dependabot security advisories
       # ignore these rules.
