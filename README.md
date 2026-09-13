@@ -11,7 +11,7 @@ score **falls** with wages. The two are near mirror images.
 
 ![AI exposure across the wage distribution](figures/ai_exposure_wage.png)
 
-## Key findings (n = 454 occupations)
+## Key findings (n = 454 of the index's 756 occupations)
 
 | Wage quintile | Median wage | Observed AI exposure | Predicted automatability (legacy) |
 |---|---|---|---|
@@ -21,9 +21,18 @@ score **falls** with wages. The two are near mirror images.
 | Q4 | $63,340 | 0.098 | 0.348 |
 | Q5 (highest) | $92,250 | 0.102 | 0.144 |
 
+The two right-hand columns do not share a denominator: the legacy score is missing for 73 of the
+454 occupations, and the gaps cluster in the top two quintiles (non-null counts by quintile: 81,
+82, 83, 68, 67).
+
 - Observed AI exposure and wages are **positively** related (Spearman ρ = 0.33, p < 10⁻¹²).
-- Across classified Claude usage, **57% is augmentation** (learning, iteration, validation) vs **43% automation** (directive, feedback-loop).
+- Across **all classified Claude.ai conversations** in the release — a platform-wide figure, not one computed within these occupations — **57% is augmentation** (learning, iteration, validation) vs **43% automation** (directive, feedback-loop).
 - The most AI-exposed occupations are cognitive/clerical: **Customer Service Representatives (0.70)**, Data Entry Keyers (0.67), Market Research Analysts (0.65), Medical Transcriptionists (0.64), Financial Analysts (0.57).
+
+> **Coverage.** 302 of the index's 756 occupations have no row in the legacy wage table and are
+> dropped by the join. They are on average *more* AI-exposed than the 454 kept (0.084 vs 0.072),
+> and include the most-exposed occupation in the whole index. Reported levels are therefore a
+> lower bound. Full accounting in [`findings.md`](findings.md#coverage-and-selection).
 
 See [`findings.md`](findings.md) for the full write-up, interpretation, and caveats.
 
@@ -36,7 +45,7 @@ python analysis.py        # prints stats, writes results.json and figures/
 ```
 
 ## Contents
-- `analysis.py` — load, join, analyze, plot (single file, ~120 lines)
+- `analysis.py` — load, join, analyze, plot (single file, ~130 lines)
 - `data/` — input CSVs + `SOURCES.md` provenance
 - `findings.md` — research note (question → method → findings → caveats)
 - `results.json` — machine-readable results
