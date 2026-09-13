@@ -1,5 +1,23 @@
 {
   "n_occupations": 454,
+  "coverage": {
+    "exposure_occupations": 756,
+    "wage_occupations": 554,
+    "matched": 454,
+    "unmatched": 302,
+    "mean_exposure_matched": 0.0717,
+    "mean_exposure_unmatched": 0.0844,
+    "most_exposed_unmatched_soc": "15-1251",
+    "most_exposed_unmatched_value": 0.7451
+  },
+  "min_family_n": 10,
+  "thin_families": {
+    "Computer and Mathematical": 4,
+    "Legal": 5,
+    "Healthcare Support": 6,
+    "Community and Social Service": 9,
+    "Building and Grounds Cleaning and Maintenance": 5
+  },
   "pearson_wage_exposure": 0.197,
   "spearman_wage_exposure": 0.333,
   "augmentation_share": 0.574,
@@ -10,35 +28,174 @@
       "n": 91,
       "median_wage": 27730.0,
       "mean_AI_exposure": 0.0372,
-      "mean_predicted_automatability": 0.7174
+      "mean_predicted_automatability": 0.7174,
+      "n_predicted_automatability": 81
     },
     {
       "wage_q": "Q2",
       "n": 91,
       "median_wage": 38750.0,
       "mean_AI_exposure": 0.0562,
-      "mean_predicted_automatability": 0.7119
+      "mean_predicted_automatability": 0.7119,
+      "n_predicted_automatability": 82
     },
     {
       "wage_q": "Q3",
       "n": 90,
       "median_wage": 49500.0,
       "mean_AI_exposure": 0.0657,
-      "mean_predicted_automatability": 0.4585
+      "mean_predicted_automatability": 0.4585,
+      "n_predicted_automatability": 83
     },
     {
       "wage_q": "Q4",
       "n": 91,
       "median_wage": 63340.0,
       "mean_AI_exposure": 0.0975,
-      "mean_predicted_automatability": 0.3478
+      "mean_predicted_automatability": 0.3478,
+      "n_predicted_automatability": 68
     },
     {
       "wage_q": "Q5 (highest pay)",
       "n": 91,
       "median_wage": 92250.0,
       "mean_AI_exposure": 0.1019,
-      "mean_predicted_automatability": 0.1444
+      "mean_predicted_automatability": 0.1444,
+      "n_predicted_automatability": 67
+    }
+  ],
+  "by_major_group": [
+    {
+      "family": "Computer and Mathematical",
+      "n": 4,
+      "median_wage": 94840.0,
+      "mean_exposure": 0.292
+    },
+    {
+      "family": "Legal",
+      "n": 5,
+      "median_wage": 99850.0,
+      "mean_exposure": 0.2392
+    },
+    {
+      "family": "Office and Administrative Support",
+      "n": 29,
+      "median_wage": 38750.0,
+      "mean_exposure": 0.2272
+    },
+    {
+      "family": "Business and Financial Operations",
+      "n": 24,
+      "median_wage": 66915.0,
+      "mean_exposure": 0.1697
+    },
+    {
+      "family": "Sales and Related",
+      "n": 10,
+      "median_wage": 28125.0,
+      "mean_exposure": 0.1503
+    },
+    {
+      "family": "Education, Training, and Library",
+      "n": 39,
+      "median_wage": 71380.0,
+      "mean_exposure": 0.1298
+    },
+    {
+      "family": "Arts, Design, Entertainment, Sports, and Media",
+      "n": 25,
+      "median_wage": 50370.0,
+      "mean_exposure": 0.1241
+    },
+    {
+      "family": "Life, Physical, and Social Science",
+      "n": 26,
+      "median_wage": 71390.0,
+      "mean_exposure": 0.1184
+    },
+    {
+      "family": "Healthcare Support",
+      "n": 6,
+      "median_wage": 37035.0,
+      "mean_exposure": 0.114
+    },
+    {
+      "family": "Management",
+      "n": 24,
+      "median_wage": 100330.0,
+      "mean_exposure": 0.0809
+    },
+    {
+      "family": "Community and Social Service",
+      "n": 9,
+      "median_wage": 48990.0,
+      "mean_exposure": 0.0688
+    },
+    {
+      "family": "Architecture and Engineering",
+      "n": 32,
+      "median_wage": 78245.0,
+      "mean_exposure": 0.0404
+    },
+    {
+      "family": "Healthcare Practitioners and Technical",
+      "n": 19,
+      "median_wage": 60370.0,
+      "mean_exposure": 0.0329
+    },
+    {
+      "family": "Building and Grounds Cleaning and Maintenance",
+      "n": 5,
+      "median_wage": 29000.0,
+      "mean_exposure": 0.0304
+    },
+    {
+      "family": "Personal Care and Service",
+      "n": 18,
+      "median_wage": 25565.0,
+      "mean_exposure": 0.0203
+    },
+    {
+      "family": "Food Preparation and Serving Related",
+      "n": 13,
+      "median_wage": 23730.0,
+      "mean_exposure": 0.0109
+    },
+    {
+      "family": "Installation, Maintenance, and Repair",
+      "n": 37,
+      "median_wage": 41450.0,
+      "mean_exposure": 0.0079
+    },
+    {
+      "family": "Transportation and Material Moving",
+      "n": 24,
+      "median_wage": 47890.0,
+      "mean_exposure": 0.007
+    },
+    {
+      "family": "Construction and Extraction",
+      "n": 28,
+      "median_wage": 42395.0,
+      "mean_exposure": 0.0053
+    },
+    {
+      "family": "Production",
+      "n": 52,
+      "median_wage": 35410.0,
+      "mean_exposure": 0.0052
+    },
+    {
+      "family": "Protective Service",
+      "n": 14,
+      "median_wage": 47690.0,
+      "mean_exposure": 0.0049
+    },
+    {
+      "family": "Farming, Fishing, and Forestry",
+      "n": 11,
+      "median_wage": 37060.0,
+      "mean_exposure": 0.0018
     }
   ],
   "peak_decile_exposure": 0.11977391304347826,

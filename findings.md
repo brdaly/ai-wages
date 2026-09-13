@@ -5,13 +5,15 @@
 ## TL;DR
 
 Joining the Anthropic Economic Index — which measures where AI is *actually* used, from real
-Claude conversations mapped to occupational tasks — to BLS wages for 454 occupations, two
-patterns run in opposite directions. **Observed AI exposure rises with wages** (from 0.04 in
+Claude conversations mapped to occupational tasks — to BLS wages for 454 of the 756 occupations
+the index covers, two patterns run in opposite directions. **Observed AI exposure rises with wages** (from 0.04 in
 the lowest-paid quintile to 0.10 in the highest; Spearman ρ = 0.33, p < 10⁻¹²) and clusters in
 upper-middle-wage knowledge and clerical work. A **legacy "automation risk" index falls with
 wages** (0.72 → 0.14), reflecting a decade of forecasts that routine, low-wage jobs would go
 first. Where AI shows up in practice is close to the mirror image of where it was predicted to
-hit — and most of that use (57%) is augmentation, not automation.
+hit. Separately, across *all* classified Claude.ai conversations in the release — not within
+these 454 occupations, which that file cannot be broken out by — 57% of use is augmentation
+rather than automation.
 
 ## Question
 
@@ -36,8 +38,42 @@ Two public sources, joined on 6-digit SOC occupation codes:
 I normalize wages to annual, collapse O\*NET sub-codes to their base SOC, drop occupations with
 missing wages, and summarize by wage quintile, by wage decile (for the trend), and by SOC major
 group. The collaboration mix (augmentation vs. automation) is taken from the index's
-`automation_vs_augmentation` file. Everything is one ~120-line script; figures regenerate from
+`automation_vs_augmentation` file, which has no occupation dimension at all — it is six global
+rows over classified conversations, so that share describes the platform, not this sample. Everything is one ~120-line script; figures regenerate from
 the public files (`analysis.py`).
+
+### Coverage and selection
+
+The join is a selection step, not a formality, and it runs against the results below.
+
+| | Occupations |
+|---|---|
+| In the index (`job_exposure.csv`) | 756 |
+| In the wage table (`wage_data.csv`, collapsed to 6-digit SOC) | 554 |
+| **Matched, and analysed here** | **454** |
+| Unmatched — no row in the legacy wage table | 302 |
+
+The 302 unmatched occupations are **more** AI-exposed than the 454 kept ones (mean observed
+exposure 0.084 versus 0.072). The single most-exposed occupation in the whole index, SOC 15-1251
+at 0.745 — above Customer Service Representatives — is among them. So the exposure levels
+reported below are a **lower bound**, and the gradient is measured on the less-exposed part of
+the distribution.
+
+The loss is not spread evenly. Only 4 of the index's 21 Computer & Mathematical occupations
+survive the join, and 11 of 35 Management occupations are dropped. Major-group means resting on
+fewer than 10 occupations are flagged as indicative in the script output and in
+`results.json` (`thin_families`); Computer & Mathematical (n = 4) and Legal (n = 5) are the two
+that appear in the "most-exposed groups" list below, and both should be read as suggestive
+rather than estimated.
+
+The legacy automatability score carries its own gap: `ChanceAuto` is missing for 73 of the 454
+matched occupations, and the missingness is concentrated in the upper half of the wage
+distribution (non-null counts by quintile: 81, 82, 83, 68, 67). The two columns in the quintile
+table therefore do not share a denominator, and the mirror-image contrast is weakest exactly
+where the legacy index is thinnest.
+
+None of this is a reason to discard the comparison, but it is the reason to treat it as
+illustrative rather than estimated.
 
 ## Findings
 
@@ -57,10 +93,13 @@ generative AI is actually being adopted.
 **3. The exposed work is cognitive and clerical — and mostly augmented, not automated.** The
 most AI-exposed occupations are Customer Service Representatives (0.70), Data Entry Keyers
 (0.67), Market Research Analysts (0.65), Medical Transcriptionists (0.64), and Financial
-Analysts (0.57); the most-exposed major groups are Computer & Mathematical, Legal, Office &
-Administrative Support, and Business & Financial Operations. Across classified usage, **57% is
-augmentation** (learning, task iteration, validation) versus **43% automation** (directive,
-feedback-loop) — i.e., people working *with* the model more often than handing tasks *to* it.
+Analysts (0.57); the most-exposed major groups are Office & Administrative Support (n = 29) and
+Business & Financial Operations (n = 24), with Computer & Mathematical (n = 4) and Legal (n = 5)
+ranking higher still on too few occupations to carry weight. Across all classified Claude.ai
+conversations in the release — a platform-wide figure, not one computed within these
+occupations — **57% is augmentation** (learning, task iteration, validation) versus **43%
+automation** (directive, feedback-loop), i.e. people working *with* the model more often than
+handing tasks *to* it.
 
 ## Why it matters, and what I'd study next
 
@@ -86,6 +125,10 @@ economic impact is distributional, and measurable.
 
 ## Caveats
 
+- **The sample is selected, and selected against the finding.** 302 of the index's 756
+  occupations have no row in the legacy wage table and are dropped. They are on average more
+  AI-exposed than the ones kept, so reported levels are a lower bound. See *Coverage and
+  selection* above.
 - **Exposure ≠ impact.** Task presence in Claude usage measures *where* AI is applied, not
   productivity, employment, or wage effects.
 - **Modest correlation, heterogeneous top.** The wage-exposure gradient is real but not strong,

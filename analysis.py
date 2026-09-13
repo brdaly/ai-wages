@@ -9,7 +9,7 @@ Public data, fully reproducible. Sources in data/SOURCES.md.
 
 Author: Brendan Daly
 """
-import glob, re, json
+import json
 import numpy as np
 import pandas as pd
 import matplotlib
@@ -20,6 +20,9 @@ from scipy import stats
 DATA = "data"
 FIG = "figures"
 
+# The quintile table gained a column; keep it printable on one line.
+pd.set_option("display.width", 160, "display.max_columns", None)
+
 # ----------------------------------------------------------------------
 # 1. Load Anthropic Economic Index "observed AI exposure" by occupation
 #    (labor_market_impacts/job_exposure.csv: occ_code = 6-digit SOC)
@@ -29,23 +32,17 @@ exp["soc6"] = exp["occ_code"].str.strip()
 exp = exp[["soc6", "observed_exposure"]]
 
 # ----------------------------------------------------------------------
-# 2. Load wage + legacy automatability table (release_2025_02_10/wage_data.csv).
-#    The raw web_fetch cache prepends 4 header lines; find the real header.
+# 2. Load wage + legacy automatability table (release_2025_02_10/wage_data.csv)
 # ----------------------------------------------------------------------
 def load_wage_data():
-    # local copy if present, else the fetch cache
     local = f"{DATA}/wage_data.csv"
     try:
         return pd.read_csv(local)
-    except Exception:
-        pass
-    cands = glob.glob("/sessions/**/tool-results/*.txt", recursive=True)
-    path = next(p for p in cands if "SOCcode,JobName" in open(p, errors="ignore").read())
-    lines = open(path, errors="ignore").read().splitlines()
-    start = next(i for i, l in enumerate(lines) if l.startswith("SOCcode,"))
-    with open(local, "w") as f:
-        f.write("\n".join(lines[start:]))
-    return pd.read_csv(local)
+    except FileNotFoundError as missing:
+        raise SystemExit(
+            f"{local} is missing. Re-download it from the URL recorded in "
+            f"{DATA}/SOURCES.md, which pins the release this analysis was run against."
+        ) from missing
 
 wd = load_wage_data()
 wd["soc6"] = wd["SOCcode"].str.split(".").str[0]
@@ -68,6 +65,27 @@ df = exp.merge(wd_soc, on="soc6", how="inner").dropna(subset=["wage"])
 df = df[df["wage"] > 0]
 n = len(df)
 
+# The wage table is a legacy file and does not cover every occupation the index
+# reports, so the inner join is a selection step, not a formality. Measure it:
+# the unmatched set is more AI-exposed than the matched set, which makes every
+# level reported below a lower bound and the major-group means conditional on
+# which occupations happened to survive.
+unmatched = exp[~exp["soc6"].isin(set(df["soc6"]))]
+coverage = {
+    "exposure_occupations": int(exp["soc6"].nunique()),
+    "wage_occupations": int(wd_soc["soc6"].nunique()),
+    "matched": int(n),
+    "unmatched": int(len(unmatched)),
+    "mean_exposure_matched": round(float(df["observed_exposure"].mean()), 4),
+    "mean_exposure_unmatched": round(float(unmatched["observed_exposure"].mean()), 4),
+    "most_exposed_unmatched_soc": str(
+        unmatched.sort_values("observed_exposure", ascending=False)["soc6"].iloc[0]
+    ),
+    "most_exposed_unmatched_value": round(
+        float(unmatched["observed_exposure"].max()), 4
+    ),
+}
+
 # ----------------------------------------------------------------------
 # 4. Headline relationships
 # ----------------------------------------------------------------------
@@ -82,6 +100,9 @@ by_q = df.groupby("wage_q", observed=True).agg(
     median_wage=("wage", "median"),
     mean_AI_exposure=("observed_exposure", "mean"),
     mean_predicted_automatability=("chance_auto", "mean"),
+    # chance_auto is missing for 73 of the 454 matched occupations, so this
+    # column does not share the denominator of the one beside it.
+    n_predicted_automatability=("chance_auto", "count"),
 )
 
 # Wage deciles (for the trend line / inverted-U test)
@@ -111,22 +132,40 @@ aug_share, auto_share = augmentation / classified, automation / classified
 # 6. Report
 # ----------------------------------------------------------------------
 print(f"Occupations matched (observed exposure x wage): {n}")
+print(f"  of {coverage['exposure_occupations']} in the index; "
+      f"{coverage['unmatched']} unmatched (no row in the wage table)")
+print(f"  mean exposure: matched {coverage['mean_exposure_matched']:.4f}, "
+      f"unmatched {coverage['mean_exposure_unmatched']:.4f} "
+      f"- the dropped occupations are the more exposed set")
+print(f"  most-exposed occupation overall, SOC {coverage['most_exposed_unmatched_soc']} "
+      f"at {coverage['most_exposed_unmatched_value']:.4f}, is unmatched")
 print(f"Pearson  r(wage, exposure)  = {r_lin:+.3f}  (p={p_lin:.1e})")
 print(f"Spearman rho(wage, exposure)= {rho:+.3f}  (p={p_rho:.1e})")
 print(f"Augmentation {aug_share:.1%} vs automation {auto_share:.1%} of classified usage\n")
 print("By wage quintile:\n", by_q.round(3), "\n")
+MIN_FAMILY_N = 10
+thin = fam[fam["n"] < MIN_FAMILY_N]
 print("Top exposed major groups:\n", fam.head(8).round(3), "\n")
+if len(thin):
+    print(f"Major groups below n={MIN_FAMILY_N}, read as indicative only:",
+          ", ".join(f"{name} (n={int(row.n)})" for name, row in thin.iterrows()), "\n")
 print("Most-exposed occupations:\n",
       top.merge(wd[['soc6','JobName']].drop_duplicates('soc6'), on='soc6')[['JobName','wage','observed_exposure']]
          .to_string(index=False))
 
 results = {
     "n_occupations": int(n),
+    "coverage": coverage,
+    "min_family_n": MIN_FAMILY_N,
+    "thin_families": {str(name): int(row.n) for name, row in thin.iterrows()},
     "pearson_wage_exposure": round(r_lin, 3),
     "spearman_wage_exposure": round(rho, 3),
     "augmentation_share": round(aug_share, 3),
     "automation_share": round(auto_share, 3),
     "by_wage_quintile": json.loads(by_q.round(4).reset_index().to_json(orient="records")),
+    "by_major_group": json.loads(
+        fam.round(4).reset_index().to_json(orient="records")
+    ),
     "peak_decile_exposure": float(dec["exposure"].max()),
     "peak_decile_index": int(dec["exposure"].idxmax()),
 }
