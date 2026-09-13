@@ -45,6 +45,10 @@ python analysis.py        # prints stats, writes results.json and figures/
 - **Anthropic Economic Index** (Feb 2025 release): `job_exposure.csv` (observed AI exposure by SOC occupation) and `automation_vs_augmentation.csv`. CC-BY. <https://huggingface.co/datasets/Anthropic/EconomicIndex>
 - **Wages + legacy automatability**: `wage_data.csv` (BLS median wages by occupation; legacy automation-probability index). Public.
 
+The code in this repository is MIT licensed. The input datasets in `data/` are
+redistributed under their own licences, as listed above and in
+[`data/SOURCES.md`](data/SOURCES.md).
+
 ## Cite
 
 See [`CITATION.cff`](CITATION.cff), or use GitHub's **Cite this repository** button.
