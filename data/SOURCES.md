@@ -46,8 +46,10 @@ selection step worth recording alongside the provenance:
 | Unmatched | 302 |
 
 The wage table is a legacy file and has no row for the other 302. Those occupations are on
-average more AI-exposed than the matched ones (0.084 vs 0.072), so every exposure level derived
-from this join is a lower bound. `analysis.py` recomputes and prints these counts on every run
+average more AI-exposed than the matched ones (0.084 vs 0.072), so the analysed sample's
+occupation-wide mean sits below the full index's. That bounds the overall mean only: the dropped
+occupations have no wage, so nothing here says where they would have fallen in the wage
+distribution or which way they would move the gradient. `analysis.py` recomputes and prints these counts on every run
 and writes them to `results.json` under `coverage`, so a change in either input surfaces rather
 than passing silently.
 

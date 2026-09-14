@@ -55,9 +55,17 @@ The join is a selection step, not a formality, and it runs against the results b
 
 The 302 unmatched occupations are **more** AI-exposed than the 454 kept ones (mean observed
 exposure 0.084 versus 0.072). The single most-exposed occupation in the whole index, SOC 15-1251
-at 0.745 — above Customer Service Representatives — is among them. So the exposure levels
-reported below are a **lower bound**, and the gradient is measured on the less-exposed part of
-the distribution.
+at 0.745 — above Customer Service Representatives — is among them.
+
+Be careful about what that does and does not establish. It shows the **occupation-wide mean of
+the analysed sample (0.072) sits below the mean of the full index**, so as a summary of "how
+exposed is work in general", this sample understates it.
+
+It does **not** make the quintile or major-group figures lower bounds, and it does **not** show
+the wage gradient is biased in either direction. The 302 are missing precisely because they have
+no wage, so there is no way to say which quintiles they would have joined. If they were
+concentrated at the top they would steepen the gradient; at the bottom, flatten it. The data
+cannot distinguish those cases, and neither can this note.
 
 The loss is not spread evenly. Only 4 of the index's 21 Computer & Mathematical occupations
 survive the join, and 11 of 35 Management occupations are dropped. Major-group means resting on
@@ -125,10 +133,11 @@ economic impact is distributional, and measurable.
 
 ## Caveats
 
-- **The sample is selected, and selected against the finding.** 302 of the index's 756
+- **The sample is selected, and the selection is not random.** 302 of the index's 756
   occupations have no row in the legacy wage table and are dropped. They are on average more
-  AI-exposed than the ones kept, so reported levels are a lower bound. See *Coverage and
-  selection* above.
+  AI-exposed than the ones kept, so this sample understates exposure *overall*. Because they
+  have no wage, their effect on the wage gradient is unknown and not assumed here. See
+  *Coverage and selection* above.
 - **Exposure ≠ impact.** Task presence in Claude usage measures *where* AI is applied, not
   productivity, employment, or wage effects.
 - **Modest correlation, heterogeneous top.** The wage-exposure gradient is real but not strong,

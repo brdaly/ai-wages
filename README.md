@@ -31,8 +31,10 @@ The two right-hand columns do not share a denominator: the legacy score is missi
 
 > **Coverage.** 302 of the index's 756 occupations have no row in the legacy wage table and are
 > dropped by the join. They are on average *more* AI-exposed than the 454 kept (0.084 vs 0.072),
-> and include the most-exposed occupation in the whole index. Reported levels are therefore a
-> lower bound. Full accounting in [`findings.md`](findings.md#coverage-and-selection).
+> and include the most-exposed occupation in the whole index. So this sample understates
+> exposure *overall*. It says nothing about the wage gradient either way, because the dropped
+> occupations have no wage and cannot be placed in a quintile. Full accounting in
+> [`findings.md`](findings.md#coverage-and-selection).
 
 See [`findings.md`](findings.md) for the full write-up, interpretation, and caveats.
 
