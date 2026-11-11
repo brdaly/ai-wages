@@ -1,9 +1,9 @@
 """
-Where is AI actually used across the wage distribution?
+Observed AI exposure across the wage distribution
 =======================================================
-Joins Anthropic Economic Index *observed* AI exposure (share of an occupation's
-work that shows up in real Claude usage) to BLS occupational wages, and contrasts
-it with a legacy *predicted* automatability score.
+Joins Anthropic's March 2026 hybrid observed-exposure measure (theoretical
+feasibility plus work-related usage, automation and task-time weights) to a
+legacy O*NET wage scrape and contrasts it with predicted automatability.
 
 Public data, fully reproducible. Sources in data/SOURCES.md.
 
@@ -16,9 +16,11 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 from scipy import stats
+from provenance import validate_inputs
 
 DATA = "data"
 FIG = "figures"
+provenance = validate_inputs(DATA)
 
 # The quintile table gained a column; keep it printable on one line.
 pd.set_option("display.width", 160, "display.max_columns", None)
@@ -29,7 +31,7 @@ pd.set_option("display.width", 160, "display.max_columns", None)
 # ----------------------------------------------------------------------
 exp = pd.read_csv(f"{DATA}/job_exposure.csv")
 exp["soc6"] = exp["occ_code"].str.strip()
-exp = exp[["soc6", "observed_exposure"]]
+exp = exp[["soc6", "title", "observed_exposure"]]
 
 # ----------------------------------------------------------------------
 # 2. Load wage + legacy automatability table (release_2025_02_10/wage_data.csv)
@@ -65,11 +67,9 @@ df = exp.merge(wd_soc, on="soc6", how="inner").dropna(subset=["wage"])
 df = df[df["wage"] > 0]
 n = len(df)
 
-# The wage table is a legacy file and does not cover every occupation the index
-# reports, so the inner join is a selection step, not a formality. Measure it:
-# the unmatched set is more AI-exposed than the matched set, which makes every
-# level reported below a lower bound and the major-group means conditional on
-# which occupations happened to survive.
+# The legacy wage table and exposure release use different occupation vintages.
+# Report join attrition without assuming which wage quintiles the missing set
+# would occupy, or which direction it would move the wage gradient.
 unmatched = exp[~exp["soc6"].isin(set(df["soc6"]))]
 coverage = {
     "exposure_occupations": int(exp["soc6"].nunique()),
@@ -100,8 +100,7 @@ by_q = df.groupby("wage_q", observed=True).agg(
     median_wage=("wage", "median"),
     mean_AI_exposure=("observed_exposure", "mean"),
     mean_predicted_automatability=("chance_auto", "mean"),
-    # chance_auto is missing for 73 of the 454 matched occupations, so this
-    # column does not share the denominator of the one beside it.
+    # The legacy score has missing values; disclose its own denominator.
     n_predicted_automatability=("chance_auto", "count"),
 )
 
@@ -135,10 +134,9 @@ print(f"Occupations matched (observed exposure x wage): {n}")
 print(f"  of {coverage['exposure_occupations']} in the index; "
       f"{coverage['unmatched']} unmatched (no row in the wage table)")
 print(f"  mean exposure: matched {coverage['mean_exposure_matched']:.4f}, "
-      f"unmatched {coverage['mean_exposure_unmatched']:.4f} "
-      f"- the dropped occupations are the more exposed set")
-print(f"  most-exposed occupation overall, SOC {coverage['most_exposed_unmatched_soc']} "
-      f"at {coverage['most_exposed_unmatched_value']:.4f}, is unmatched")
+      f"unmatched {coverage['mean_exposure_unmatched']:.4f}")
+print(f"  most-exposed unmatched occupation: SOC {coverage['most_exposed_unmatched_soc']} "
+      f"at {coverage['most_exposed_unmatched_value']:.4f}")
 print(f"Pearson  r(wage, exposure)  = {r_lin:+.3f}  (p={p_lin:.1e})")
 print(f"Spearman rho(wage, exposure)= {rho:+.3f}  (p={p_rho:.1e})")
 print(f"Augmentation {aug_share:.1%} vs automation {auto_share:.1%} of classified usage\n")
@@ -150,16 +148,18 @@ if len(thin):
     print(f"Major groups below n={MIN_FAMILY_N}, read as indicative only:",
           ", ".join(f"{name} (n={int(row.n)})" for name, row in thin.iterrows()), "\n")
 print("Most-exposed occupations:\n",
-      top.merge(wd[['soc6','JobName']].drop_duplicates('soc6'), on='soc6')[['JobName','wage','observed_exposure']]
-         .to_string(index=False))
+      top[['title','wage','observed_exposure']].to_string(index=False))
 
 results = {
+    "provenance": provenance,
     "n_occupations": int(n),
     "coverage": coverage,
     "min_family_n": MIN_FAMILY_N,
     "thin_families": {str(name): int(row.n) for name, row in thin.iterrows()},
     "pearson_wage_exposure": round(r_lin, 3),
     "spearman_wage_exposure": round(rho, 3),
+    "pearson_p_value": float(p_lin),
+    "spearman_p_value": float(p_rho),
     "augmentation_share": round(aug_share, 3),
     "automation_share": round(auto_share, 3),
     "by_wage_quintile": json.loads(by_q.round(4).reset_index().to_json(orient="records")),
@@ -185,9 +185,10 @@ ax[0].plot(dec["mid_wage"], dec["exposure"], "-o", color=NAVY, lw=2.4, ms=6, lab
 ax[0].set_xscale("log")
 ax[0].set_xticks([30000, 50000, 100000, 200000])
 ax[0].get_xaxis().set_major_formatter(matplotlib.ticker.FuncFormatter(lambda x, _: f"${x/1000:.0f}k"))
-ax[0].set_xlabel("Median annual wage (BLS, log scale)")
-ax[0].set_ylabel("Observed AI exposure  (share of work seen in Claude usage)")
-ax[0].set_title("A.  AI use is concentrated in upper-middle-wage knowledge work", fontsize=11.5, color=NAVY, loc="left")
+ax[0].xaxis.set_minor_formatter(matplotlib.ticker.NullFormatter())
+ax[0].set_xlabel("Legacy median annual wage (nominal $, log scale)")
+ax[0].set_ylabel("Observed exposure (weighted task coverage)")
+ax[0].set_title("A.  Observed exposure and legacy occupational wages", fontsize=11.5, color=NAVY, loc="left")
 ax[0].legend(frameon=False, fontsize=9)
 
 # Panel B: observed exposure vs predicted automatability by wage quintile
@@ -198,14 +199,14 @@ ax[1].bar(x + w/2, by_q["mean_predicted_automatability"], w, color=ORANGE, label
 ax[1].set_xticks(x); ax[1].set_xticklabels(["Q1\nlowest", "Q2", "Q3", "Q4", "Q5\nhighest"])
 ax[1].set_xlabel("Occupation wage quintile")
 ax[1].set_ylabel("Mean score")
-ax[1].set_title("B.  Where AI is used ≠ what was predicted to be automated", fontsize=11.5, color=NAVY, loc="left")
+ax[1].set_title("B.  Exposure and legacy automatability are distinct measures", fontsize=11.5, color=NAVY, loc="left")
 ax[1].legend(frameon=False, fontsize=9)
 
-fig.suptitle("Where AI is actually used across the wage distribution",
+fig.suptitle("Observed AI exposure across the wage distribution",
              fontsize=14, fontweight="bold", color=NAVY, x=0.012, ha="left")
 fig.text(0.012, 0.005,
-         "Source: Anthropic Economic Index (Claude.ai usage, O*NET tasks) joined to BLS wages. "
-         f"n={n} occupations. Observed exposure vs. a legacy predicted-automatability index.",
+         "Source: Anthropic March 2026 exposure measure + legacy O*NET wage scrape (2018 wage spot checks). "
+         f"n={n}; different constructs/vintages; legacy score has missing values. See data/SOURCES.md.",
          fontsize=8, color="#666")
 fig.tight_layout(rect=[0, 0.03, 1, 0.95])
 fig.savefig(f"{FIG}/ai_exposure_wage.png", dpi=150, bbox_inches="tight")

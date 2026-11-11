@@ -1,67 +1,88 @@
-# Where AI Is Actually Used Across the Wage Distribution
+# Observed AI Exposure Across the Wage Distribution
 
-A short, reproducible empirical note joining the **Anthropic Economic Index** (observed AI
-use by occupation, derived from real Claude.ai conversations mapped to O\*NET tasks) to
-**BLS occupational wages**, and contrasting it with a legacy *predicted*-automatability index.
+A reproducible empirical note joining **Anthropic's March 2026 observed-exposure measure**
+to a **legacy O*NET occupational wage table**, and contrasting it with a legacy
+predicted-automatability index. Observed exposure combines theoretical feasibility and
+work-related Claude usage with automation and task-time weights; it is not a raw usage share.
 
-**Headline:** Where generative AI is *actually* used looks almost nothing like what a decade
-of "automation risk" forecasts predicted. Observed AI exposure **rises** with wages and
-concentrates in upper-middle-wage knowledge and clerical work; the legacy automatability
-score **falls** with wages. The two are near mirror images.
+**Finding:** In the 672 matched occupations, observed exposure is modestly positively
+associated with legacy wages (Spearman ρ = 0.288), while the legacy automatability score
+falls across wage quintiles. The exposure quintile means are not strictly monotonic.
+These are descriptive comparisons of different constructs and vintages.
 
-![AI exposure across the wage distribution](figures/ai_exposure_wage.png)
+![Observed AI exposure and legacy wages](figures/ai_exposure_wage.png)
 
-## Key findings (n = 454 of the index's 756 occupations)
+## Key findings (n = 672 of 756 exposure occupations)
 
-| Wage quintile | Median wage | Observed AI exposure | Predicted automatability (legacy) |
-|---|---|---|---|
-| Q1 (lowest) | $27,730 | 0.037 | 0.717 |
-| Q2 | $38,750 | 0.056 | 0.712 |
-| Q3 | $49,500 | 0.066 | 0.459 |
-| Q4 | $63,340 | 0.098 | 0.348 |
-| Q5 (highest) | $92,250 | 0.102 | 0.144 |
+| Wage quintile | Median legacy wage | Observed exposure | Legacy automatability | Occupations with legacy score |
+|---|---:|---:|---:|---:|
+| Q1 (lowest) | $28,260 | 0.0378 | 0.7447 | 123 / 135 |
+| Q2 | $38,055 | 0.0566 | 0.7041 | 121 / 134 |
+| Q3 | $48,270 | 0.0557 | 0.5665 | 124 / 134 |
+| Q4 | $62,340 | 0.0949 | 0.3948 | 109 / 134 |
+| Q5 (highest) | $91,130 | 0.1051 | 0.1766 | 106 / 135 |
 
-The two right-hand columns do not share a denominator: the legacy score is missing for 73 of the
-454 occupations, and the gaps cluster in the top two quintiles (non-null counts by quintile: 81,
-82, 83, 68, 67).
+The legacy score is missing for 89 of the matched occupations, so the two score columns
+have different denominators. The wage table was already committed upstream in January
+2020; checked wage values match May 2018 BLS estimates. A uniform year for all wage rows
+has not been established. These are not current wages or an estimate of changes over time.
 
-- Observed AI exposure and wages are **positively** related (Spearman ρ = 0.33, p < 10⁻¹²).
-- Across **all classified Claude.ai conversations** in the release — a platform-wide figure, not one computed within these occupations — **57% is augmentation** (learning, iteration, validation) vs **43% automation** (directive, feedback-loop).
-- The most AI-exposed occupations are cognitive/clerical: **Customer Service Representatives (0.70)**, Data Entry Keyers (0.67), Market Research Analysts (0.65), Medical Transcriptionists (0.64), Financial Analysts (0.57).
+Separately, **57.4% augmentation / 42.6% automation** describes the named interaction
+categories in the **February 2025 Claude.ai release**. That file has no occupation dimension
+and is a different vintage from the exposure measure; it cannot describe the 672-occupation
+sample or explain the exposure–wage relationship.
 
-> **Coverage.** 302 of the index's 756 occupations have no row in the legacy wage table and are
-> dropped by the join. They are on average *more* AI-exposed than the 454 kept (0.084 vs 0.072),
-> and include the most-exposed occupation in the whole index. So this sample understates
-> exposure *overall*. It says nothing about the wage gradient either way, because the dropped
-> occupations have no wage and cannot be placed in a quintile. Full accounting in
-> [`findings.md`](findings.md#coverage-and-selection).
+> **Coverage:** 84 occupations do not match the legacy wage table. Their mean exposure
+> (0.1325) exceeds the matched mean (0.0700), but their missing wages prevent assigning
+> a direction to any bias in the wage gradient. See [findings.md](findings.md).
 
-See [`findings.md`](findings.md) for the full write-up, interpretation, and caveats.
+## Correction prepared November 11, 2026
+
+Source verification found that the previous wage CSV ended mid-record after 702 complete
+rows, and two exposure values differed from the upstream source. All three inputs now
+match a pinned upstream revision byte for byte. The corrected sample is **672**, previously
+454; Spearman ρ is **0.288**, previously 0.333. The positive association remains, with
+revised magnitudes and coverage. All tables and the figure have been regenerated.
+See [CORRECTIONS.md](CORRECTIONS.md) for the before/after accounting.
 
 ## Reproduce
 
+Use **CPython 3.12.14**, recorded in `.python-version`, and the complete pinned environment:
+
 ```bash
-pip install -r requirements.txt
-# Data are public (CC-BY / public domain) — see data/SOURCES.md for the two source files.
-python analysis.py        # prints stats, writes results.json and figures/
+python3.12 -m venv .venv
+. .venv/bin/activate
+python -m pip install -r requirements.txt
+python -m pip check
+python analysis.py
+python -m unittest discover --start-directory tests --verbose
 ```
 
-## Contents
-- `analysis.py` — load, join, analyze, plot (single file, ~130 lines)
-- `data/` — input CSVs + `SOURCES.md` provenance
-- `findings.md` — research note (question → method → findings → caveats)
-- `results.json` — machine-readable results
+The analysis reads only the committed inputs, verifies their checksums and CSV structure
+before computing results, and requires no network access. `results.json` records the
+manifest hash and source revision. Tests regenerate the figure and compare every published
+numerical result, and reject altered or truncated inputs. A first Matplotlib run may build
+its font cache; set `MPLCONFIGDIR` to a writable directory if needed.
 
-## Data
-- **Anthropic Economic Index** (Feb 2025 release): `job_exposure.csv` (observed AI exposure by SOC occupation) and `automation_vs_augmentation.csv`. CC-BY. <https://huggingface.co/datasets/Anthropic/EconomicIndex>
-- **Wages + legacy automatability**: `wage_data.csv` (BLS median wages by occupation; legacy automation-probability index). Public.
+If a local input is missing or damaged, `python scripts/restore_inputs.py` explicitly
+re-downloads only the pinned, checksum-verified snapshots. It checks all downloads before
+replacing any input. Updating the research to a new dataset is a separate, deliberate change.
 
-The code in this repository is MIT licensed. The input datasets in `data/` are
-redistributed under their own licences, as listed above and in
-[`data/SOURCES.md`](data/SOURCES.md).
+## Contents and sources
+
+- `analysis.py` — load, clean, join, analyze and plot.
+- `data/` — three frozen CSVs, [source/vintage notes](data/SOURCES.md) and [input manifest](data/input_manifest.json).
+- `findings.md` — method, findings and limitations.
+- `results.json` and `figures/` — regenerated outputs.
+- `CORRECTIONS.md` — documented data repair and resulting changes.
+
+The exposure measure comes from [Anthropic's March 2026 methodology](https://www.anthropic.com/research/labor-market-impacts).
+The collaboration mix and legacy wage table come from its February 2025 dataset release.
+The input data are released by Anthropic under CC-BY; code here is MIT licensed.
 
 ## Cite
 
-See [`CITATION.cff`](CITATION.cff), or use GitHub's **Cite this repository** button.
+See [CITATION.cff](CITATION.cff). The working correction is identified as `1.1.0-dev`;
+its release date should be set when a corrected release is published.
 
-*Author: Brendan Daly · June 2026. Built as a small empirical artifact; all figures regenerate from public data. The repository itself is the artifact; use GitHub's **Code → Download ZIP** for a snapshot.*
+*Brendan Daly · original note June 2026; correction prepared November 11, 2026.*
