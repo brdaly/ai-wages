@@ -1,0 +1,57 @@
+{
+  "schema_version": 1,
+  "source_repository": "Anthropic/EconomicIndex",
+  "source_revision": "4e5f69fab13a9c3f7d0dcc31a6f893a9818738f6",
+  "verified_on": "2026-11-11",
+  "transformations": "None: all three local CSVs are byte-for-byte upstream snapshots. Cleaning is performed only in analysis.py.",
+  "files": [
+    {
+      "filename": "job_exposure.csv",
+      "source_path": "labor_market_impacts/job_exposure.csv",
+      "url": "https://huggingface.co/datasets/Anthropic/EconomicIndex/resolve/4e5f69fab13a9c3f7d0dcc31a6f893a9818738f6/labor_market_impacts/job_exposure.csv",
+      "publication_date": "2026-03-05",
+      "methodology_url": "https://www.anthropic.com/research/labor-market-impacts",
+      "sha256": "4f0a3adf5feeb2ec5f5d02ab18cc5e851a2a4b8470bde84c0c9335017be12d68",
+      "rows": 756,
+      "columns": [
+        "occ_code",
+        "title",
+        "observed_exposure"
+      ]
+    },
+    {
+      "filename": "automation_vs_augmentation.csv",
+      "source_path": "release_2025_02_10/automation_vs_augmentation.csv",
+      "url": "https://huggingface.co/datasets/Anthropic/EconomicIndex/resolve/4e5f69fab13a9c3f7d0dcc31a6f893a9818738f6/release_2025_02_10/automation_vs_augmentation.csv",
+      "publication_date": "2025-02-10",
+      "methodology_url": "https://www.anthropic.com/news/the-anthropic-economic-index",
+      "sha256": "d1e264882b17618db4f4a00b6f87f48134222bc5c15eefb3d46aae9519e89d11",
+      "rows": 6,
+      "columns": [
+        "interaction_type",
+        "pct"
+      ]
+    },
+    {
+      "filename": "wage_data.csv",
+      "source_path": "release_2025_02_10/wage_data.csv",
+      "url": "https://huggingface.co/datasets/Anthropic/EconomicIndex/resolve/4e5f69fab13a9c3f7d0dcc31a6f893a9818738f6/release_2025_02_10/wage_data.csv",
+      "publication_date": "2025-02-10",
+      "methodology_url": "https://huggingface.co/datasets/Anthropic/EconomicIndex/blob/4e5f69fab13a9c3f7d0dcc31a6f893a9818738f6/release_2025_02_10/README.md",
+      "sha256": "4453fc56402c94306e4749ad62b6f7c313f63d884ca99bab767a52e7d627b15f",
+      "rows": 1090,
+      "columns": [
+        "SOCcode",
+        "JobName",
+        "JobFamily",
+        "isBright",
+        "isGreen",
+        "JobZone",
+        "MedianSalary",
+        "JobForecast",
+        "ChanceAuto",
+        "WageGroup"
+      ]
+    }
+  ]
+}
